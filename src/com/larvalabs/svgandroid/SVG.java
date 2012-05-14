@@ -1,8 +1,11 @@
 package com.larvalabs.svgandroid;
 
+import android.graphics.Path;
 import android.graphics.Picture;
 import android.graphics.RectF;
 import android.graphics.drawable.PictureDrawable;
+
+import java.util.Vector;
 
 /*
 
@@ -45,6 +48,13 @@ public class SVG {
      */
     private RectF limits = null;
 
+
+    /**
+     * Path objects describing each of the distinct shapes that were seen while decoding
+     * the svg. May be null if this information was not recorded by the parser.
+     */
+  private Vector<Path> paths = null;
+
     /**
      * Construct a new SVG.
      * @param picture the parsed picture object.
@@ -61,6 +71,13 @@ public class SVG {
      */
     void setLimits(RectF limits) {
         this.limits = limits;
+    }
+
+    /**
+     * Set the vector of stored Paths.
+     */
+    void setPaths(Vector<Path> paths) {
+        this.paths = paths;
     }
 
     /**
@@ -116,5 +133,9 @@ public class SVG {
      */
     public RectF getLimits() {
         return limits;
+    }
+
+    public Vector<Path> getPaths() {
+        return paths;
     }
 }

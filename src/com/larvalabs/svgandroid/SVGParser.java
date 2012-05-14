@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 /*
 
@@ -36,6 +37,9 @@ import java.util.HashMap;
    See the License for the specific language governing permissions and
    limitations under the License.
 
+   Note: Modifications made by Mark T. Tomczak<fixermark@gmail.com>:
+   * Addition of Path parsing subsystem(TODO(mtomczak): Cite specific
+     function entrypoints when they are completed).
  */
 
 /**
@@ -63,7 +67,7 @@ public class SVGParser {
      * @throws SVGParseException if there is an error while parsing.
      */
     public static SVG getSVGFromInputStream(InputStream svgData) throws SVGParseException {
-        return SVGParser.parse(svgData, 0, 0, false);
+        return SVGParser.parse(svgData, 0, 0, false, false);
     }
 
     /**
@@ -74,7 +78,7 @@ public class SVGParser {
      * @throws SVGParseException if there is an error while parsing.
      */
     public static SVG getSVGFromString(String svgData) throws SVGParseException {
-        return SVGParser.parse(new ByteArrayInputStream(svgData.getBytes()), 0, 0, false);
+        return SVGParser.parse(new ByteArrayInputStream(svgData.getBytes()), 0, 0, false, false);
     }
 
     /**
@@ -86,7 +90,7 @@ public class SVGParser {
      * @throws SVGParseException if there is an error while parsing.
      */
     public static SVG getSVGFromResource(Resources resources, int resId) throws SVGParseException {
-        return SVGParser.parse(resources.openRawResource(resId), 0, 0, false);
+        return SVGParser.parse(resources.openRawResource(resId), 0, 0, false, false);
     }
 
     /**
@@ -115,7 +119,7 @@ public class SVGParser {
      * @throws SVGParseException if there is an error while parsing.
      */
     public static SVG getSVGFromInputStream(InputStream svgData, int searchColor, int replaceColor) throws SVGParseException {
-        return SVGParser.parse(svgData, searchColor, replaceColor, false);
+        return SVGParser.parse(svgData, searchColor, replaceColor, false, false);
     }
 
     /**
@@ -128,7 +132,7 @@ public class SVGParser {
      * @throws SVGParseException if there is an error while parsing.
      */
     public static SVG getSVGFromString(String svgData, int searchColor, int replaceColor) throws SVGParseException {
-        return SVGParser.parse(new ByteArrayInputStream(svgData.getBytes()), searchColor, replaceColor, false);
+        return SVGParser.parse(new ByteArrayInputStream(svgData.getBytes()), searchColor, replaceColor, false, false);
     }
 
     /**
@@ -142,7 +146,7 @@ public class SVGParser {
      * @throws SVGParseException if there is an error while parsing.
      */
     public static SVG getSVGFromResource(Resources resources, int resId, int searchColor, int replaceColor) throws SVGParseException {
-        return SVGParser.parse(resources.openRawResource(resId), searchColor, replaceColor, false);
+        return SVGParser.parse(resources.openRawResource(resId), searchColor, replaceColor, false, false);
     }
 
     /**
@@ -164,6 +168,22 @@ public class SVGParser {
     }
 
     /**
+     * Parse the SVG data from an Android application resource, specifying whether
+     * the path should be recorded.
+     *
+     * @param resources    the Android context
+     * @param resId        the ID of the raw resource SVG.
+     * @param storePaths   whether paths describing each object loaded should
+     *                     be stored.
+     * @return the parsed SVG.
+     * @throws SVGParseException if there is an error while parsing.
+     *
+     */
+    public static SVG getSVGFromResource(Resources resources, int resId, boolean storePaths) throws SVGParseException {
+        return SVGParser.parse(resources.openRawResource(resId), 0, 0, false, storePaths);
+    }
+
+    /**
      * Parses a single SVG path and returns it as a <code>android.graphics.Path</code> object.
      * An example path is <code>M250,150L150,350L350,350Z</code>, which draws a triangle.
      *
@@ -173,7 +193,7 @@ public class SVGParser {
         return doPath(pathString);
     }
 
-    private static SVG parse(InputStream in, Integer searchColor, Integer replaceColor, boolean whiteMode) throws SVGParseException {
+    private static SVG parse(InputStream in, Integer searchColor, Integer replaceColor, boolean whiteMode, boolean storePaths) throws SVGParseException {
 //        Util.debug("Parsing SVG...");
         try {
             long start = System.currentTimeMillis();
@@ -181,13 +201,18 @@ public class SVGParser {
             SAXParser sp = spf.newSAXParser();
             XMLReader xr = sp.getXMLReader();
             final Picture picture = new Picture();
-            SVGHandler handler = new SVGHandler(picture);
+            Vector<Path> paths = null;
+            if (storePaths) {
+                paths = new Vector<Path>();
+            }
+            SVGHandler handler = new SVGHandler(picture, paths);
             handler.setColorSwap(searchColor, replaceColor);
             handler.setWhiteMode(whiteMode);
             xr.setContentHandler(handler);
             xr.parse(new InputSource(in));
 //        Util.debug("Parsing complete in " + (System.currentTimeMillis() - start) + " millis.");
             SVG result = new SVG(picture, handler.bounds);
+            result.setPaths(paths);
             // Skip bounds if it was an empty pic
             if (!Float.isInfinite(handler.limits.top)) {
                 result.setLimits(handler.limits);
@@ -781,10 +806,15 @@ public class SVGParser {
         HashMap<String, Gradient> gradientRefMap = new HashMap<String, Gradient>();
         Gradient gradient = null;
 
-        private SVGHandler(Picture picture) {
+        Vector<Path> paths = null;
+
+        private SVGHandler(Picture picture, Vector<Path> paths) {
             this.picture = picture;
             paint = new Paint();
             paint.setAntiAlias(true);
+            this.paths = paths;
+            // TODO(mtomczak): If paths is not null, need to retain
+            // path every time we compute a shape.
         }
 
         public void setColorSwap(Integer searchColor, Integer replaceColor) {
@@ -1071,6 +1101,9 @@ public class SVGParser {
                     canvas.drawRect(x, y, x + width, y + height, paint);
                 }
                 popTransform();
+                if (null != paths) {
+                    paths.add(PathMaker.rect(x, y, width, height));
+                }
             } else if (!hidden && localName.equals("line")) {
                 Float x1 = getFloatAttr("x1", atts);
                 Float x2 = getFloatAttr("x2", atts);
@@ -1083,6 +1116,9 @@ public class SVGParser {
                     doLimits(x2, y2);
                     canvas.drawLine(x1, y1, x2, y2, paint);
                     popTransform();
+                    if (null != paths) {
+                        paths.add(PathMaker.line(x1, x2, y1, y2));
+                    }
                 }
             } else if (!hidden && localName.equals("circle")) {
                 Float centerX = getFloatAttr("cx", atts);
@@ -1100,6 +1136,9 @@ public class SVGParser {
                         canvas.drawCircle(centerX, centerY, radius, paint);
                     }
                     popTransform();
+                    if (null != paths) {
+                        paths.add(PathMaker.circle(centerX, centerY, radius));
+                    }
                 }
             } else if (!hidden && localName.equals("ellipse")) {
                 Float centerX = getFloatAttr("cx", atts);
@@ -1119,6 +1158,14 @@ public class SVGParser {
                         canvas.drawOval(rect, paint);
                     }
                     popTransform();
+                    if (null != paths) {
+                      paths.add(
+                                PathMaker.ellipse(
+                                                  centerX,
+                                                  centerY,
+                                                  radiusX,
+                                                  radiusY));
+                    }
                 }
             } else if (!hidden && (localName.equals("polygon") || localName.equals("polyline"))) {
                 NumberParse numbers = getNumberParseAttr("points", atts);
@@ -1147,6 +1194,9 @@ public class SVGParser {
                         }
                         popTransform();
                     }
+                    if (null != paths) {
+                        paths.add(p);
+                    }
                 }
             } else if (!hidden && localName.equals("path")) {
                 Path p = doPath(getStringAttr("d", atts));
@@ -1160,6 +1210,9 @@ public class SVGParser {
                     canvas.drawPath(p, paint);
                 }
                 popTransform();
+                if (null != paths) {
+                    paths.add(p);
+                }
             } else if (!hidden) {
                 Log.d(TAG, "UNRECOGNIZED SVG COMMAND: " + localName);
             }
@@ -1244,6 +1297,36 @@ public class SVGParser {
                 }
                 // Clear gradient map
                 gradientMap.clear();
+            }
+        }
+        /**
+         * Converts primitive shapes into Path objects.
+         *
+         * @author Mark T. Tomczak
+         */
+        private static class PathMaker {
+            public static Path rect(
+                float x, float y, float width, float height) {
+                Path p = new Path();
+                p.addRect(x, y, x + width, y + height, Path.Direction.CCW);
+                return p;
+            }
+            public static Path line(float x1, float x2, float y1, float y2) {
+                Path p = new Path();
+                p.moveTo(x1, y1);
+                p.lineTo(x2, y2);
+                return p;
+            }
+            public static Path circle(float cx, float cy, float radius) {
+                Path p = new Path();
+                p.addCircle(cx, cy, radius, Path.Direction.CCW);
+                return p;
+            }
+            public static Path ellipse(float cx, float cy, float rx, float ry) {
+                RectF ovalBounds = new RectF(cx - rx, cy - ry, cx + rx, cy + ry);
+                Path p = new Path();
+                p.addOval(ovalBounds, Path.Direction.CCW);
+                return p;
             }
         }
     }
