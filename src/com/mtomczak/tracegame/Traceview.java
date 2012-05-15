@@ -52,36 +52,42 @@ public class Traceview extends View {
 
     Paint paint = new Paint();
 
-    StringBuilder sb = new StringBuilder();
-    Formatter formatter = new Formatter(sb);
-    formatter.format("Path count: %d", trace_image_.getPaths().size());
-
     int[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.GRAY};
 
     int i=0;
     for (Enumeration<Pathpoints> e = path_points_.elements();
          e.hasMoreElements(); i++) {
-      paint.setColor(colors[i % colors.length]);
-      for (Enumeration<PointF> e2 = e.nextElement().getPoints().elements();
+      int current_color = colors[i % colors.length];
+
+      for (Enumeration<Pathpoints.Pathpoint> e2 = e.nextElement().getPoints().elements();
            e2.hasMoreElements();) {
-        PointF p = e2.nextElement();
+        Pathpoints.Pathpoint path_point = e2.nextElement();
+        PointF p = path_point.getPoint();
+        if (path_point.isSelected()) {
+          paint.setColor(Color.YELLOW);
+        } else {
+          paint.setColor(current_color);
+        }
         canvas.drawCircle(p.x, p.y, 3, paint);
       }
     }
-
-    paint.setColor(Color.RED);
-    paint.setTextSize(15);
-    canvas.drawText(sb.toString(), 5, 60, paint);
-
-    paint.setColor(Color.GREEN);
-    paint.setTextSize(25);
-    canvas.drawText("Boom!", x_location_, y_location_, paint);
   }
 
   @Override
     public boolean onTouchEvent(MotionEvent event) {
     x_location_ = (int)event.getX();
     y_location_ = (int)event.getY();
+    for (Enumeration<Pathpoints> e = path_points_.elements();
+         e.hasMoreElements();) {
+      for (Enumeration<Pathpoints.Pathpoint> e2 = e.nextElement().getPoints().elements();
+           e2.hasMoreElements();) {
+        Pathpoints.Pathpoint path_point = e2.nextElement();
+        if (path_point.isInRange(x_location_, y_location_)) {
+          path_point.select();
+        }
+      }
+    }
+
     invalidate();
     return true;
   }
