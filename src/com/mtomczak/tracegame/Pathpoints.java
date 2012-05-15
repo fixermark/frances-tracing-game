@@ -21,6 +21,17 @@ public class Pathpoints {
     return points_;
   }
 
+  public boolean allPointsSelected() {
+    for (Enumeration<Pathpoint> e = points_.elements();
+         e.hasMoreElements();) {
+      Pathpoint path_point = e.nextElement();
+      if (!path_point.isSelected()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * Tries to select a valid point near the specified coordinate
    */

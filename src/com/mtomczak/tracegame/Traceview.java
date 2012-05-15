@@ -18,6 +18,8 @@ import com.mtomczak.tracegame.Pathpoints;
 import java.lang.StringBuilder;
 import java.util.Enumeration;
 import java.util.Formatter;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 public class Traceview extends View {
@@ -27,14 +29,22 @@ public class Traceview extends View {
 
   SVG trace_image_;
 
+  Timer load_timer_ = null;
+  boolean loading_ = false;
+
   Vector<Pathpoints> path_points_;
 
   public Traceview(Context context, AttributeSet attrs) {
     super(context, attrs);
     x_location_ = 30;
     y_location_ = 30;
-    trace_image_ = SVGParser.getSVGFromResource(getResources(), R.raw.smile, true);
     setBackgroundColor(Color.WHITE);
+    load_timer_ = new Timer();
+    loadImage();
+  }
+
+  private void loadImage() {
+    trace_image_ = SVGParser.getSVGFromResource(getResources(), R.raw.smile, true);
 
     path_points_ = new Vector<Pathpoints>();
     Vector<Path> paths = trace_image_.getPaths();
@@ -42,6 +52,8 @@ public class Traceview extends View {
     for (Enumeration<Path> e = paths.elements(); e.hasMoreElements();) {
       path_points_.add(new Pathpoints(e.nextElement(), 15));
     }
+    loading_ = false;
+    postInvalidate();
   }
 
   @Override
@@ -71,6 +83,15 @@ public class Traceview extends View {
         canvas.drawCircle(p.x, p.y, 3, paint);
       }
     }
+
+    if (allPathsSelected()) {
+      paint.setColor(Color.GREEN);
+      paint.setTextSize(25);
+      canvas.drawText("Yay!", 50, 200, paint);
+      if (!loading_) {
+        scheduleLoad();
+      }
+    }
   }
 
   @Override
@@ -85,5 +106,32 @@ public class Traceview extends View {
 
     invalidate();
     return true;
+  }
+
+  private boolean allPathsSelected() {
+    for (Enumeration<Pathpoints> e = path_points_.elements();
+         e.hasMoreElements();) {
+      if (!e.nextElement().allPointsSelected()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void scheduleLoad() {
+    loading_ = true;
+    load_timer_.schedule(new LoadImageTask(this), 2000);
+  }
+
+  private static class LoadImageTask extends TimerTask {
+    private Traceview view_;
+
+    public LoadImageTask(Traceview view) {
+      view_ = view;
+    }
+    @Override
+      public void run() {
+      view_.loadImage();
+    }
   }
 }
