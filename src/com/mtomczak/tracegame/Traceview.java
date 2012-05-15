@@ -79,13 +79,8 @@ public class Traceview extends View {
     y_location_ = (int)event.getY();
     for (Enumeration<Pathpoints> e = path_points_.elements();
          e.hasMoreElements();) {
-      for (Enumeration<Pathpoints.Pathpoint> e2 = e.nextElement().getPoints().elements();
-           e2.hasMoreElements();) {
-        Pathpoints.Pathpoint path_point = e2.nextElement();
-        if (path_point.isInRange(x_location_, y_location_)) {
-          path_point.select();
-        }
-      }
+      Pathpoints path_points = e.nextElement();
+      path_points.selectValidPoint(x_location_, y_location_);
     }
 
     invalidate();
