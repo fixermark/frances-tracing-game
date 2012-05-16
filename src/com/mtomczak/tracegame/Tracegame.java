@@ -3,6 +3,7 @@ package com.mtomczak.tracegame;
 import android.app.Activity;
 import android.os.Bundle;
 
+
 public class Tracegame extends Activity {
   /** Called when the activity is first created. */
   @Override

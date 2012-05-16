@@ -27,10 +27,14 @@ public class Traceview extends View {
   int x_location_;
   int y_location_;
 
+  int resource_index_ = 0;
+
   SVG trace_image_;
 
   Timer load_timer_ = null;
   boolean loading_ = false;
+
+  public static final int RESOURCES[] = {R.raw.smile, R.raw.house};
 
   Vector<Pathpoints> path_points_;
 
@@ -44,7 +48,10 @@ public class Traceview extends View {
   }
 
   private void loadImage() {
-    trace_image_ = SVGParser.getSVGFromResource(getResources(), R.raw.smile, true);
+    trace_image_ = SVGParser.getSVGFromResource(
+      getResources(),
+      RESOURCES[resource_index_ % RESOURCES.length],
+      true);
 
     path_points_ = new Vector<Pathpoints>();
     Vector<Path> paths = trace_image_.getPaths();
@@ -148,6 +155,7 @@ public class Traceview extends View {
     }
     @Override
       public void run() {
+      view_.resource_index_++;
       view_.loadImage();
     }
   }
