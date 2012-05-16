@@ -64,6 +64,32 @@ public class Traceview extends View {
 
     Paint paint = new Paint();
 
+    for (Enumeration<Pathpoints> e = path_points_.elements();
+         e.hasMoreElements();) {
+      Vector<Path> paths = e.nextElement().getSelectedSegments();
+      Paint path_paint = new Paint();
+      path_paint.setStrokeWidth(5);
+      path_paint.setColor(Color.MAGENTA);
+      path_paint.setStyle(Paint.Style.STROKE);
+      for (Enumeration<Path> e2 = paths.elements();
+           e2.hasMoreElements();) {
+        canvas.drawPath(e2.nextElement(), path_paint);
+      }
+    }
+
+    //highlightPoints(canvas, paint);
+
+    if (allPathsSelected()) {
+      paint.setColor(Color.GREEN);
+      paint.setTextSize(25);
+      canvas.drawText("Yay!", 50, 200, paint);
+      if (!loading_) {
+        scheduleLoad();
+      }
+    }
+  }
+
+  private void highlightPoints(Canvas canvas, Paint paint) {
     int[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.GRAY};
 
     int i=0;
@@ -81,15 +107,6 @@ public class Traceview extends View {
           paint.setColor(current_color);
         }
         canvas.drawCircle(p.x, p.y, 3, paint);
-      }
-    }
-
-    if (allPathsSelected()) {
-      paint.setColor(Color.GREEN);
-      paint.setTextSize(25);
-      canvas.drawText("Yay!", 50, 200, paint);
-      if (!loading_) {
-        scheduleLoad();
       }
     }
   }

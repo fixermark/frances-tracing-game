@@ -11,14 +11,30 @@ import java.util.Vector;
 public class Pathpoints {
   Vector<Pathpoint> points_ = null;
   Vector<Pathpoint> selectable_points_ = null;
+  Vector<Path> path_segments_ = null;
 
   public Pathpoints(Path path, float dist) {
     points_ = Pathpoints.PathToPoints(path, dist);
+    path_segments_ = Pathpoints.PathToSegments(path, dist);
     selectable_points_ = new Vector<Pathpoint>();
   }
 
   public Vector<Pathpoint> getPoints() {
     return points_;
+  }
+
+  /**
+   * Return a vector listing all the segments that are bounded
+   * by two selected elements.
+   */
+  public Vector<Path> getSelectedSegments() {
+    Vector<Path> selected = new Vector<Path>();
+    for (int i=0; i < points_.size()-1; i++) {
+      if (points_.get(i).isSelected() && points_.get(i+1).isSelected()) {
+        selected.add(path_segments_.get(i));
+      }
+    }
+    return selected;
   }
 
   public boolean allPointsSelected() {
@@ -90,14 +106,30 @@ public class Pathpoints {
       measure.getPosTan(step, pos, tan);
       points.add(new Pathpoint(pos[0], pos[1]));
     }
+    measure.getPosTan(path_length, pos, tan);
+    points.add(new Pathpoint(pos[0], pos[1]));
     return points;
+  }
+
+  static public Vector<Path> PathToSegments(Path path, float dist) {
+    Vector<Path> segments = new Vector<Path>();
+    PathMeasure measure = new PathMeasure(path, false);
+    float path_length = measure.getLength();
+
+    for (float step = 0; step < path_length; step += dist) {
+      Path segment = new Path();
+      if (measure.getSegment(step, step + dist, segment, true)) {
+        segments.add(segment);
+      }
+    }
+    return segments;
   }
 
   public static class Pathpoint {
     private PointF point_ = null;
     private boolean selected_;
 
-    private static final float SELECT_RANGE = 20;
+    private static final float SELECT_RANGE = 25;
 
     public Pathpoint(float x, float y) {
       selected_ = false;
