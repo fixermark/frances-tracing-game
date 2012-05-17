@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.view.View;
 import android.util.AttributeSet;
@@ -18,23 +20,24 @@ import com.mtomczak.tracegame.Pathpoints;
 import java.lang.StringBuilder;
 import java.util.Enumeration;
 import java.util.Formatter;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 
-public class Traceview extends View {
+public class Traceview extends View
+  implements MediaPlayer.OnCompletionListener {
 
   int x_location_;
   int y_location_;
 
   int resource_index_ = 0;
 
+  MediaPlayer yay_sound_ = null;
+  MediaPlayer intro_sound_ = null;
+
   SVG trace_image_;
 
-  Timer load_timer_ = null;
-  boolean loading_ = false;
+ boolean loading_ = false;
 
-  public static final int RESOURCES[] = {
+  public static final int TRACE_RESOURCES[] = {
     R.raw.circle,
     R.raw.square,
     R.raw.triangle,
@@ -43,6 +46,17 @@ public class Traceview extends View {
     R.raw.house
   };
 
+  public static final int SOUND_RESOURCES[] = {
+    R.raw.circle_snd,
+    R.raw.square_snd,
+    R.raw.triangle_snd,
+    R.raw.smile_snd,
+    R.raw.car_snd,
+    R.raw.house_snd
+  };
+
+  public static final int YAY_RESOURCE = R.raw.yay_snd;
+
   Vector<Pathpoints> path_points_;
 
   public Traceview(Context context, AttributeSet attrs) {
@@ -50,14 +64,20 @@ public class Traceview extends View {
     x_location_ = 30;
     y_location_ = 30;
     setBackgroundColor(Color.WHITE);
-    load_timer_ = new Timer();
+    loadSounds();
     loadImage();
+  }
+
+  private void loadSounds() {
+    yay_sound_ = MediaPlayer.create(getContext(), YAY_RESOURCE);
+    yay_sound_.setOnCompletionListener(this);
+    intro_sound_ = new MediaPlayer();
   }
 
   private void loadImage() {
     trace_image_ = SVGParser.getSVGFromResource(
       getResources(),
-      RESOURCES[resource_index_ % RESOURCES.length],
+      TRACE_RESOURCES[resource_index_ % TRACE_RESOURCES.length],
       true);
 
     path_points_ = new Vector<Pathpoints>();
@@ -66,6 +86,11 @@ public class Traceview extends View {
     for (Path path : paths) {
       path_points_.add(new Pathpoints(path, 15));
     }
+    intro_sound_.release();
+    intro_sound_ = MediaPlayer.create(
+      getContext(),
+      SOUND_RESOURCES[resource_index_ % SOUND_RESOURCES.length]);
+    intro_sound_.start();
     loading_ = false;
     postInvalidate();
   }
@@ -91,13 +116,8 @@ public class Traceview extends View {
 
     //highlightPoints(canvas, paint);
 
-    if (allPathsSelected()) {
-      paint.setColor(Color.GREEN);
-      paint.setTextSize(25);
-      canvas.drawText("Yay!", 50, 200, paint);
-      if (!loading_) {
-        scheduleLoad();
-      }
+    if (allPathsSelected() && !loading_) {
+      goToNextTrace();
     }
   }
 
@@ -132,6 +152,10 @@ public class Traceview extends View {
     return true;
   }
 
+  public void onCompletion(MediaPlayer mp) {
+    loadNextImage();
+  }
+
   private boolean allPathsSelected() {
     for (Pathpoints path_points : path_points_) {
       if (!path_points.allPointsSelected()) {
@@ -141,21 +165,14 @@ public class Traceview extends View {
     return true;
   }
 
-  private void scheduleLoad() {
+  private void goToNextTrace() {
     loading_ = true;
-    load_timer_.schedule(new LoadImageTask(this), 2000);
+    yay_sound_.start();
+    // On completion, yay sound will move forward to next image.
   }
 
-  private static class LoadImageTask extends TimerTask {
-    private Traceview view_;
-
-    public LoadImageTask(Traceview view) {
-      view_ = view;
-    }
-    @Override
-      public void run() {
-      view_.resource_index_++;
-      view_.loadImage();
-    }
+  private void loadNextImage() {
+    resource_index_++;
+    loadImage();
   }
 }
