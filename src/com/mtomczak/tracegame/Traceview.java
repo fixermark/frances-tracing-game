@@ -34,7 +34,14 @@ public class Traceview extends View {
   Timer load_timer_ = null;
   boolean loading_ = false;
 
-  public static final int RESOURCES[] = {R.raw.smile, R.raw.house};
+  public static final int RESOURCES[] = {
+    R.raw.circle,
+    R.raw.square,
+    R.raw.triangle,
+    R.raw.smile,
+    R.raw.car,
+    R.raw.house
+  };
 
   Vector<Pathpoints> path_points_;
 
@@ -56,8 +63,8 @@ public class Traceview extends View {
     path_points_ = new Vector<Pathpoints>();
     Vector<Path> paths = trace_image_.getPaths();
 
-    for (Enumeration<Path> e = paths.elements(); e.hasMoreElements();) {
-      path_points_.add(new Pathpoints(e.nextElement(), 15));
+    for (Path path : paths) {
+      path_points_.add(new Pathpoints(path, 15));
     }
     loading_ = false;
     postInvalidate();
@@ -71,16 +78,14 @@ public class Traceview extends View {
 
     Paint paint = new Paint();
 
-    for (Enumeration<Pathpoints> e = path_points_.elements();
-         e.hasMoreElements();) {
-      Vector<Path> paths = e.nextElement().getSelectedSegments();
+    for (Pathpoints path_points : path_points_) {
+      Vector<Path> paths = path_points.getSelectedSegments();
       Paint path_paint = new Paint();
       path_paint.setStrokeWidth(5);
       path_paint.setColor(Color.MAGENTA);
       path_paint.setStyle(Paint.Style.STROKE);
-      for (Enumeration<Path> e2 = paths.elements();
-           e2.hasMoreElements();) {
-        canvas.drawPath(e2.nextElement(), path_paint);
+      for (Path path : paths) {
+        canvas.drawPath(path, path_paint);
       }
     }
 
@@ -100,13 +105,10 @@ public class Traceview extends View {
     int[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.GRAY};
 
     int i=0;
-    for (Enumeration<Pathpoints> e = path_points_.elements();
-         e.hasMoreElements(); i++) {
+    for (Pathpoints path_points : path_points_) {
       int current_color = colors[i % colors.length];
 
-      for (Enumeration<Pathpoints.Pathpoint> e2 = e.nextElement().getPoints().elements();
-           e2.hasMoreElements();) {
-        Pathpoints.Pathpoint path_point = e2.nextElement();
+      for (Pathpoints.Pathpoint path_point : path_points.getPoints()) {
         PointF p = path_point.getPoint();
         if (path_point.isSelected()) {
           paint.setColor(Color.YELLOW);
@@ -122,9 +124,7 @@ public class Traceview extends View {
     public boolean onTouchEvent(MotionEvent event) {
     x_location_ = (int)event.getX();
     y_location_ = (int)event.getY();
-    for (Enumeration<Pathpoints> e = path_points_.elements();
-         e.hasMoreElements();) {
-      Pathpoints path_points = e.nextElement();
+    for (Pathpoints path_points : path_points_) {
       path_points.selectValidPoint(x_location_, y_location_);
     }
 
@@ -133,9 +133,8 @@ public class Traceview extends View {
   }
 
   private boolean allPathsSelected() {
-    for (Enumeration<Pathpoints> e = path_points_.elements();
-         e.hasMoreElements();) {
-      if (!e.nextElement().allPointsSelected()) {
+    for (Pathpoints path_points : path_points_) {
+      if (!path_points.allPointsSelected()) {
         return false;
       }
     }
