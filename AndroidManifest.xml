@@ -6,7 +6,7 @@
     <application android:label="@string/app_name"
                  android:icon="@drawable/icon"
                  android:theme="@android:style/Theme.NoTitleBar">
-        <activity android:name="Frances\'s Tracing Game"
+        <activity android:name="Tracegame"
                   android:label="@string/app_name"
                   android:configChanges="orientation|keyboardHidden|screenSize"
                   android:screenOrientation="portrait">
