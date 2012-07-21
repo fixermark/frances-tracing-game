@@ -1,9 +1,9 @@
-<svg width="320" height="526" xmlns="http://www.w3.org/2000/svg">
+<svg width="174" height="154" xmlns="http://www.w3.org/2000/svg">
  <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
  <g>
   <title>Layer 1</title>
-  <circle fill="none" stroke="#000000" stroke-width="5" cx="104" cy="209" r="24.59674" id="svg_1"/>
-  <circle fill="none" stroke="#000000" stroke-width="5" cx="211" cy="209" r="24.59674" id="svg_2"/>
-  <path fill="none" stroke="#000000" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" d="m84,284c4.48719,32.28119 21.08973,39.87677 70,34.18008c69.55127,2.53186 78.52563,-13.92523 83.46153,-37.97787" id="svg_3"/>
+  <circle id="svg_1" r="24.59674" cy="34" cx="34" stroke-width="5" stroke="#000000" fill="none"/>
+  <circle id="svg_2" r="24.59674" cy="34" cx="141" stroke-width="5" stroke="#000000" fill="none"/>
+  <path id="svg_3" d="m14,109c4.48719,32.28119 21.08973,39.87677 70,34.18008c69.55127,2.53186 78.52563,-13.92523 83.46153,-37.97787" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="none"/>
  </g>
 </svg>

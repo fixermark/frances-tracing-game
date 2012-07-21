@@ -1,7 +1,7 @@
-<svg width="320" height="526" xmlns="http://www.w3.org/2000/svg">
+<svg width="298" height="214" xmlns="http://www.w3.org/2000/svg">
  <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
  <g>
   <title>Layer 1</title>
-  <path id="svg_5" d="m162,165l-142,196l280,-2l-138,-194z" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="none"/>
+  <path fill="none" stroke="#000000" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" d="m151,9l-142,196l280,-2l-138,-194z" id="svg_5"/>
  </g>
 </svg>
