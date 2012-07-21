@@ -92,7 +92,16 @@ public class Traceview extends View
       SOUND_RESOURCES[resource_index_ % SOUND_RESOURCES.length]);
     intro_sound_.start();
     loading_ = false;
-    postInvalidate();
+  }
+
+  @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    if (null == trace_image_ || null==trace_image_.getPicture()) {
+      setMeasuredDimension(100, 200);
+    } else {
+      setMeasuredDimension(trace_image_.getPicture().getWidth(),
+                           trace_image_.getPicture().getHeight());
+    }
   }
 
   @Override
@@ -154,6 +163,9 @@ public class Traceview extends View
 
   public void onCompletion(MediaPlayer mp) {
     loadNextImage();
+    requestLayout();
+    postInvalidate();
+    getRootView().findViewById(R.id.mainview).postInvalidate();
   }
 
   private boolean allPathsSelected() {
