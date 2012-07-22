@@ -42,7 +42,7 @@ public class Traceview extends View
     R.raw.square,
     R.raw.triangle,
     R.raw.smile,
-    R.raw.car,
+    //R.raw.car,
     R.raw.house
   };
 
@@ -51,7 +51,7 @@ public class Traceview extends View
     R.raw.square_snd,
     R.raw.triangle_snd,
     R.raw.smile_snd,
-    R.raw.car_snd,
+    //R.raw.car_snd,
     R.raw.house_snd
   };
 
