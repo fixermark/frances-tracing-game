@@ -1,3 +1,8 @@
+// Copyright 2012 Mark T. Tomczak
+// Part of "Frances's Tracing Game"
+// See LICENSE file at the root of the software project
+// for more information.
+
 package com.mtomczak.tracegame;
 
 import android.graphics.Path;
