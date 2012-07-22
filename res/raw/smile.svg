@@ -1,9 +1,26 @@
 <svg width="174" height="154" xmlns="http://www.w3.org/2000/svg">
- <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
- <g>
-  <title>Layer 1</title>
-  <circle id="svg_1" r="24.59674" cy="34" cx="34" stroke-width="5" stroke="#000000" fill="none"/>
-  <circle id="svg_2" r="24.59674" cy="34" cx="141" stroke-width="5" stroke="#000000" fill="none"/>
-  <path id="svg_3" d="m14,109c4.48719,32.28119 21.08973,39.87677 70,34.18008c69.55127,2.53186 78.52563,-13.92523 83.46153,-37.97787" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="none"/>
- </g>
+  <!--
+
+    Copyright 2012 Mark T. Tomczak
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+   -->
+
+  <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+  <g>
+    <title>Layer 1</title>
+    <circle id="svg_1" r="24.59674" cy="34" cx="34" stroke-width="5" stroke="#000000" fill="none"/>
+    <circle id="svg_2" r="24.59674" cy="34" cx="141" stroke-width="5" stroke="#000000" fill="none"/>
+    <path id="svg_3" d="m14,109c4.48719,32.28119 21.08973,39.87677 70,34.18008c69.55127,2.53186 78.52563,-13.92523 83.46153,-37.97787" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="none"/>
+  </g>
 </svg>
