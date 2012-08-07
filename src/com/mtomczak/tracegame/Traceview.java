@@ -166,11 +166,17 @@ public class Traceview extends View
   }
 
   @Override
-    public boolean onTouchEvent(MotionEvent event) {
-    x_location_ = (int)event.getX();
-    y_location_ = (int)event.getY();
-    for (Pathpoints path_points : path_points_) {
-      path_points.selectValidPoint(x_location_, y_location_);
+  public boolean onTouchEvent(MotionEvent event) {
+    // We handle multiple touch pointers here, because it turns out
+    // that it's asking a lot of tiny hands to keep their other
+    // fingers, palm, etc. off the screen and only touch with one
+    // fingertip at a time. :)
+    for (int i=0; i < event.getPointerCount(); i++) {
+      x_location_ = (int)event.getX(i);
+      y_location_ = (int)event.getY(i);
+      for (Pathpoints path_points : path_points_) {
+        path_points.selectValidPoint(x_location_, y_location_);
+      }
     }
 
     invalidate();
