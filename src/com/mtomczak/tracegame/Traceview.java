@@ -39,7 +39,8 @@ import java.util.Formatter;
 import java.util.Vector;
 
 public class Traceview extends View
-  implements MediaPlayer.OnCompletionListener {
+  implements MediaPlayer.OnCompletionListener,
+             View.OnTouchListener {
 
   int x_location_;
   int y_location_;
@@ -163,6 +164,12 @@ public class Traceview extends View
         canvas.drawCircle(p.x, p.y, 3, paint);
       }
     }
+  }
+
+  @Override
+  public boolean onTouch(View v, MotionEvent event) {
+    event.offsetLocation(-getLeft(), -getTop());
+    return onTouchEvent(event);
   }
 
   @Override
