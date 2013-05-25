@@ -110,15 +110,15 @@ public class Traceview extends View
     loading_ = false;
   }
 
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    if (null == trace_image_ || null==trace_image_.getPicture()) {
-      setMeasuredDimension(100, 200);
-    } else {
-      setMeasuredDimension(trace_image_.getPicture().getWidth(),
-                           trace_image_.getPicture().getHeight());
-    }
-  }
+  //@Override
+  // protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+  //   if (null == trace_image_ || null==trace_image_.getPicture()) {
+  //     setMeasuredDimension(100, 200);
+  //   } else {
+  //     setMeasuredDimension(trace_image_.getPicture().getWidth(),
+  //                          trace_image_.getPicture().getHeight());
+  //   }
+  //}
 
   @Override
     protected void onDraw (Canvas canvas) {
@@ -138,8 +138,6 @@ public class Traceview extends View
         canvas.drawPath(path, path_paint);
       }
     }
-
-    //highlightPoints(canvas, paint);
 
     if (allPathsSelected() && !loading_) {
       goToNextTrace();
@@ -181,7 +179,6 @@ public class Traceview extends View
     loadNextImage();
     requestLayout();
     postInvalidate();
-    getRootView().findViewById(R.id.mainview).postInvalidate();
   }
 
   private boolean allPathsSelected() {
