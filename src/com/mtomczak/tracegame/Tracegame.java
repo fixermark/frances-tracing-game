@@ -19,6 +19,7 @@ package com.mtomczak.tracegame;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.mtomczak.tracegame.Traceview;
 
 public class Tracegame extends Activity {
   /** Called when the activity is first created. */
@@ -26,5 +27,9 @@ public class Tracegame extends Activity {
     public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+    Traceview traceview=(Traceview)findViewById(
+      R.id.traceview);
+    findViewById(R.id.mainview).setOnTouchListener(
+      traceview);
   }
 }

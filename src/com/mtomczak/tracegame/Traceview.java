@@ -39,7 +39,8 @@ import java.util.Formatter;
 import java.util.Vector;
 
 public class Traceview extends View
-  implements MediaPlayer.OnCompletionListener {
+  implements MediaPlayer.OnCompletionListener,
+             View.OnTouchListener {
 
   int x_location_;
   int y_location_;
@@ -59,7 +60,9 @@ public class Traceview extends View
     R.raw.triangle,
     R.raw.smile,
     R.raw.car,
-    R.raw.house
+    R.raw.house,
+    R.raw.tree,
+    R.raw.dog
   };
 
   public static final int SOUND_RESOURCES[] = {
@@ -68,7 +71,9 @@ public class Traceview extends View
     R.raw.triangle_snd,
     R.raw.smile_snd,
     R.raw.car_snd,
-    R.raw.house_snd
+    R.raw.house_snd,
+    R.raw.tree_snd,
+    R.raw.dog_snd
   };
 
   public static final int YAY_RESOURCE = R.raw.yay_snd;
@@ -164,11 +169,23 @@ public class Traceview extends View
   }
 
   @Override
-    public boolean onTouchEvent(MotionEvent event) {
-    x_location_ = (int)event.getX();
-    y_location_ = (int)event.getY();
-    for (Pathpoints path_points : path_points_) {
-      path_points.selectValidPoint(x_location_, y_location_);
+  public boolean onTouch(View v, MotionEvent event) {
+    event.offsetLocation(-getLeft(), -getTop());
+    return onTouchEvent(event);
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    // We handle multiple touch pointers here, because it turns out
+    // that it's asking a lot of tiny hands to keep their other
+    // fingers, palm, etc. off the screen and only touch with one
+    // fingertip at a time. :)
+    for (int i=0; i < event.getPointerCount(); i++) {
+      x_location_ = (int)event.getX(i);
+      y_location_ = (int)event.getY(i);
+      for (Pathpoints path_points : path_points_) {
+        path_points.selectValidPoint(x_location_, y_location_);
+      }
     }
 
     invalidate();
