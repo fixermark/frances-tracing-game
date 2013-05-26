@@ -21,12 +21,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Picture;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.view.View;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.larvalabs.svgandroid.SVGParser;
 import com.larvalabs.svgandroid.SVG;
@@ -45,14 +48,22 @@ public class Traceview extends View
   int x_location_;
   int y_location_;
 
-  int resource_index_ = 0;
+  // The center of the canvas is offset to center the picture in the view.
+  float canvas_offset_x_ = 0;
+  float canvas_offset_y_ = 0;
+
+  // Index of the current picture to show. This starts at
+  // -1 so that when we load, we increment it to 0 (and show
+  // the first picture).
+  int resource_index_ = -1;
 
   MediaPlayer yay_sound_ = null;
   MediaPlayer intro_sound_ = null;
 
   SVG trace_image_;
 
- boolean loading_ = false;
+  boolean loading_ = false;
+  boolean load_next_image_ = true;
 
   public static final int TRACE_RESOURCES[] = {
     R.raw.circle,
@@ -86,7 +97,6 @@ public class Traceview extends View
     y_location_ = 30;
     setBackgroundColor(Color.WHITE);
     loadSounds();
-    loadImage();
   }
 
   private void loadSounds() {
@@ -104,6 +114,23 @@ public class Traceview extends View
     path_points_ = new Vector<Pathpoints>();
     Vector<Path> paths = trace_image_.getPaths();
 
+    // Calculate offset needed to center the image in the view.
+    Picture trace_picture = trace_image_.getPicture();
+    float image_center_x = (float)(trace_picture.getWidth() / 2);
+    float image_center_y = (float)(trace_picture.getHeight() / 2);
+    float canvas_center_x = (float)(getWidth() / 2);
+    float canvas_center_y = (float)(getHeight() / 2);
+    Log.w("Frances", Float.toString(image_center_x)
+	  + Float.toString(image_center_y) + " "
+	  + Float.toString(canvas_center_x) + " "
+	  + Float.toString(canvas_center_y));
+    canvas_offset_x_ = canvas_center_x - image_center_x;
+    canvas_offset_y_ = canvas_center_y - image_center_y;
+
+    Log.w("Frances", "Bounds set to "
+	  + Float.toString(canvas_offset_x_) + ", " +
+          Float.toString(canvas_offset_y_));
+
     for (Path path : paths) {
       path_points_.add(new Pathpoints(path, 15));
     }
@@ -115,21 +142,19 @@ public class Traceview extends View
     loading_ = false;
   }
 
-  //@Override
-  // protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-  //   if (null == trace_image_ || null==trace_image_.getPicture()) {
-  //     setMeasuredDimension(100, 200);
-  //   } else {
-  //     setMeasuredDimension(trace_image_.getPicture().getWidth(),
-  //                          trace_image_.getPicture().getHeight());
-  //   }
-  //}
-
   @Override
     protected void onDraw (Canvas canvas) {
     super.onDraw(canvas);
 
-    canvas.drawPicture(trace_image_.getPicture());
+    if (load_next_image_) {
+      loadNextImage();
+    }
+
+    Picture trace_picture = trace_image_.getPicture();
+
+    canvas.translate(canvas_offset_x_, canvas_offset_y_);
+    trace_picture.draw(canvas);
+    // canvas.drawPicture(trace_picture);
 
     Paint paint = new Paint();
 
@@ -181,8 +206,11 @@ public class Traceview extends View
     // fingers, palm, etc. off the screen and only touch with one
     // fingertip at a time. :)
     for (int i=0; i < event.getPointerCount(); i++) {
-      x_location_ = (int)event.getX(i);
-      y_location_ = (int)event.getY(i);
+      // subtract the canvas offset to convert from screen coordinates
+      // back into picture-local coordinates (which is what we
+      // calculated the touch points in).
+      x_location_ = (int)event.getX(i) - (int)canvas_offset_x_;
+      y_location_ = (int)event.getY(i) - (int)canvas_offset_y_;
       for (Pathpoints path_points : path_points_) {
         path_points.selectValidPoint(x_location_, y_location_);
       }
@@ -193,8 +221,7 @@ public class Traceview extends View
   }
 
   public void onCompletion(MediaPlayer mp) {
-    loadNextImage();
-    requestLayout();
+    load_next_image_ = true;
     postInvalidate();
   }
 
@@ -216,5 +243,6 @@ public class Traceview extends View
   private void loadNextImage() {
     resource_index_++;
     loadImage();
+    load_next_image_ = false;
   }
 }

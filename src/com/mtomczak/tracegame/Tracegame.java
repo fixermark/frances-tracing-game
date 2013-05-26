@@ -29,7 +29,7 @@ public class Tracegame extends Activity {
     setContentView(R.layout.main);
     Traceview traceview=(Traceview)findViewById(
       R.id.traceview);
-    findViewById(R.id.mainview).setOnTouchListener(
+    findViewById(R.id.traceview).setOnTouchListener(
       traceview);
   }
 }
