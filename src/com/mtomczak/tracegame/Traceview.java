@@ -73,7 +73,8 @@ public class Traceview extends View
     R.raw.car,
     R.raw.house,
     R.raw.tree,
-    R.raw.dog
+    R.raw.dog,
+    R.raw.clouds
   };
 
   public static final int SOUND_RESOURCES[] = {
@@ -84,7 +85,8 @@ public class Traceview extends View
     R.raw.car_snd,
     R.raw.house_snd,
     R.raw.tree_snd,
-    R.raw.dog_snd
+    R.raw.dog_snd,
+    R.raw.clouds_snd
   };
 
   public static final int YAY_RESOURCE = R.raw.yay_snd;
