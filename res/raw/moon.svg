@@ -1,0 +1,25 @@
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!--
+
+Copyright 2013 Mark T. Tomczak
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+  <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+  <g>
+    <title>Layer 1</title>
+    <g id="svg_1"/>
+    <path fill="none" stroke="#000000" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" d="m161.5,30c-83,2 -117,54 -114,126c3,72 42,121 125,122" id="svg_5"/>
+    <path stroke="#000000" fill="none" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" d="m160.5,30c-30,36 -29,81 -29,117c0,36 8,86 39,131" id="svg_6"/>
+  </g>
+</svg>

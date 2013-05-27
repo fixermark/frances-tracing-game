@@ -74,9 +74,12 @@ public class Traceview extends View
     R.raw.house,
     R.raw.tree,
     R.raw.dog,
-    R.raw.clouds
+    R.raw.clouds,
+    R.raw.sun,
+    R.raw.moon
   };
 
+  // Note: 44.1kHz mono have generally worked best.
   public static final int SOUND_RESOURCES[] = {
     R.raw.circle_snd,
     R.raw.square_snd,
@@ -86,7 +89,9 @@ public class Traceview extends View
     R.raw.house_snd,
     R.raw.tree_snd,
     R.raw.dog_snd,
-    R.raw.clouds_snd
+    R.raw.clouds_snd,
+    R.raw.sun_snd,
+    R.raw.moon_snd
   };
 
   public static final int YAY_RESOURCE = R.raw.yay_snd;
