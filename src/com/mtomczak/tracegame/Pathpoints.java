@@ -28,7 +28,17 @@ public class Pathpoints {
   Vector<Pathpoint> points_ = null;
   Vector<Path> path_segments_ = null;
 
-  public Pathpoints(Path path, float dist) {
+  float scale_factor_;
+  float pivot_x_;
+  float pivot_y_;
+
+  public Pathpoints(Path path, float dist, float scale_factor,
+                    float pivot_x, float pivot_y) {
+
+    scale_factor_ = scale_factor;
+    pivot_x_ = pivot_x;
+    pivot_y_ = pivot_y;
+
     points_ = Pathpoints.PathToPoints(path, dist);
     path_segments_ = Pathpoints.PathToSegments(path, dist);
   }
@@ -65,6 +75,11 @@ public class Pathpoints {
    */
   public void selectValidPoint(float x, float y) {
     Vector<Pathpoint> points_to_search = points_;
+
+    // scale the input point from view image space to
+    // original coordinate space.
+    x = (x - pivot_x_) * (1.0f / scale_factor_) + pivot_x_;
+    y = (y - pivot_y_) * (1.0f / scale_factor_) + pivot_y_;
 
     for (Pathpoint path_point : points_to_search) {
       if (!path_point.isSelected()) {
@@ -110,7 +125,7 @@ public class Pathpoints {
     private PointF point_ = null;
     private boolean selected_;
 
-    private static final float SELECT_RANGE = 25;
+    private static final float SELECT_RANGE = 15;
 
     public Pathpoint(float x, float y) {
       selected_ = false;

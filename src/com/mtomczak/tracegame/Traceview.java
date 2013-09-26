@@ -24,6 +24,7 @@ import android.graphics.Path;
 import android.graphics.Picture;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.view.MotionEvent;
@@ -61,9 +62,26 @@ public class Traceview extends View
   MediaPlayer intro_sound_ = null;
 
   SVG trace_image_;
+  String trace_image_name_;
+  float trace_image_scale_factor_;
 
   boolean loading_ = false;
   boolean load_next_image_ = true;
+
+  public static final String TRACE_NAMES[] = {
+    "circle",
+    "square",
+    "triangle",
+    "smile",
+    "car",
+    "house",
+    "tree",
+    "dog",
+    "clouds",
+    "sun",
+    "moon",
+    "jellyfish"
+  };
 
   public static final int TRACE_RESOURCES[] = {
     R.raw.circle,
@@ -76,7 +94,8 @@ public class Traceview extends View
     R.raw.dog,
     R.raw.clouds,
     R.raw.sun,
-    R.raw.moon
+    R.raw.moon,
+    R.raw.jellyfish
   };
 
   // Note: 44.1kHz mono have generally worked best.
@@ -91,7 +110,8 @@ public class Traceview extends View
     R.raw.dog_snd,
     R.raw.clouds_snd,
     R.raw.sun_snd,
-    R.raw.moon_snd
+    R.raw.moon_snd,
+    R.raw.jellyfish_snd
   };
 
   public static final int YAY_RESOURCE = R.raw.yay_snd;
@@ -117,6 +137,7 @@ public class Traceview extends View
       getResources(),
       TRACE_RESOURCES[resource_index_ % TRACE_RESOURCES.length],
       true);
+    trace_image_name_ = TRACE_NAMES[resource_index_ % TRACE_NAMES.length];
 
     path_points_ = new Vector<Pathpoints>();
     Vector<Path> paths = trace_image_.getPaths();
@@ -138,8 +159,13 @@ public class Traceview extends View
 	  + Float.toString(canvas_offset_x_) + ", " +
           Float.toString(canvas_offset_y_));
 
+    float viewWidth = (float)(getWidth());
+    // scale factor = (scale ratio) * view width / image width
+    trace_image_scale_factor_ = 0.8f * viewWidth / ((float)trace_picture.getWidth());
+
     for (Path path : paths) {
-      path_points_.add(new Pathpoints(path, 15));
+      path_points_.add(new Pathpoints(path, 15, trace_image_scale_factor_,
+                                      image_center_x, image_center_y));
     }
     intro_sound_.release();
     intro_sound_ = MediaPlayer.create(
@@ -153,15 +179,22 @@ public class Traceview extends View
     protected void onDraw (Canvas canvas) {
     super.onDraw(canvas);
 
+
     if (load_next_image_) {
       loadNextImage();
     }
 
+
     Picture trace_picture = trace_image_.getPicture();
+    // Scale up the canvas to fit in the frame (with 1/4 margins left on each side)
+    canvas.scale(trace_image_scale_factor_,
+                 trace_image_scale_factor_,
+                 canvas.getWidth() / 2.0f,
+                 canvas.getHeight() / 2.0f);
+
 
     canvas.translate(canvas_offset_x_, canvas_offset_y_);
     trace_picture.draw(canvas);
-    // canvas.drawPicture(trace_picture);
 
     Paint paint = new Paint();
 
@@ -175,6 +208,18 @@ public class Traceview extends View
         canvas.drawPath(path, path_paint);
       }
     }
+
+    // Name the picture
+    Paint text_paint = new Paint();
+    text_paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+    text_paint.setTextAlign(Paint.Align.CENTER);
+    text_paint.setTextSize(24);
+    text_paint.setColor(Color.BLUE);
+    text_paint.setStyle(Paint.Style.FILL);
+    canvas.drawText(trace_image_name_,
+                    ((float)trace_picture.getWidth()) / 2.0f,
+                    (float)trace_picture.getHeight() + 24.0f,
+                    text_paint);
 
     if (allPathsSelected() && !loading_) {
       goToNextTrace();
@@ -218,8 +263,10 @@ public class Traceview extends View
       // calculated the touch points in).
       x_location_ = (int)event.getX(i) - (int)canvas_offset_x_;
       y_location_ = (int)event.getY(i) - (int)canvas_offset_y_;
-      for (Pathpoints path_points : path_points_) {
-        path_points.selectValidPoint(x_location_, y_location_);
+      if (path_points_ != null) {
+        for (Pathpoints path_points : path_points_) {
+          path_points.selectValidPoint(x_location_, y_location_);
+        }
       }
     }
 
